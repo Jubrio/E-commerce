@@ -1,0 +1,14 @@
+// backend/routes/auth.routes.js — VERSION COMPLÈTE avec mot de passe oublié
+const express        = require('express');
+const router         = express.Router();
+const AuthController = require('../controllers/auth.controller');
+const { verifyToken } = require('../middleware/auth.middleware');
+
+router.post('/register',             AuthController.register);
+router.post('/verify-email', AuthController.verifyEmail);
+router.post('/login',                AuthController.login);
+router.get('/me',                    verifyToken, AuthController.me);
+router.post('/mot-de-passe-oublie',  AuthController.motDePasseOublie);
+router.post('/reset-password-code', AuthController.resetPasswordWithCode); // nouvelle route
+
+module.exports = router;
