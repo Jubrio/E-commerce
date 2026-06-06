@@ -1,0 +1,54 @@
+// utils/mailer.js — Resend API (fonctionne sur Railway)
+const { Resend } = require('resend');
+
+const resend = new Resend(process.env.RESEND_API_KEY);
+
+const FROM = 'Bazar Guyane <onboarding@resend.dev>'; // domaine par défaut Resend
+
+async function sendVerificationEmail({ to, nom, code }) {
+  await resend.emails.send({
+    from: FROM,
+    to,
+    subject: 'Bienvenue sur Bazar Guyane — Vérifiez votre email',
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 500px; margin: auto; padding: 20px; border: 1px solid #e5e7eb; border-radius: 16px;">
+        <h2 style="color: #f97316; margin-bottom: 16px;">Bazar Guyane — Vérification de votre compte</h2>
+        <p>Bonjour <strong>${nom}</strong>,</p>
+        <p>Merci de vous être inscrit sur Bazar Guyane, la marketplace de la Guyane.</p>
+        <p>Pour activer votre compte, veuillez saisir le code ci-dessous :</p>
+        <div style="font-size: 36px; font-weight: bold; letter-spacing: 8px; background-color: #f3f4f6; padding: 16px; text-align: center; border-radius: 12px; margin: 24px 0;">
+          ${code}
+        </div>
+        <p>Ce code expire dans <strong>15 minutes</strong>.</p>
+        <p style="color: #666; font-size: 14px;">Si vous n'êtes pas à l'origine de cette inscription, ignorez cet email.</p>
+        <hr style="border-color: #e5e7eb; margin: 20px 0;">
+        <p style="color: #666; font-size: 12px;">Administration — L'équipe Bazar Guyane</p>
+      </div>
+    `,
+  });
+}
+
+async function sendPasswordResetEmail({ to, nom, code }) {
+  await resend.emails.send({
+    from: FROM,
+    to,
+    subject: 'Réinitialisation de votre mot de passe — Bazar Guyane',
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 500px; margin: auto; padding: 20px; border: 1px solid #e5e7eb; border-radius: 16px;">
+        <h2 style="color: #f97316; margin-bottom: 16px;">Bazar Guyane — Réinitialisation du mot de passe</h2>
+        <p>Bonjour <strong>${nom}</strong>,</p>
+        <p>Vous avez demandé à réinitialiser votre mot de passe.</p>
+        <p>Voici votre code de vérification :</p>
+        <div style="font-size: 36px; font-weight: bold; letter-spacing: 8px; background-color: #f3f4f6; padding: 16px; text-align: center; border-radius: 12px; margin: 24px 0;">
+          ${code}
+        </div>
+        <p>Ce code expire dans <strong>5 minutes</strong>.</p>
+        <p style="color: #666; font-size: 14px;">Si vous n'êtes pas à l'origine de cette demande, ignorez cet email.</p>
+        <hr style="border-color: #e5e7eb; margin: 20px 0;">
+        <p style="color: #666; font-size: 12px;">Administration — L'équipe Bazar Guyane</p>
+      </div>
+    `,
+  });
+}
+
+module.exports = { sendVerificationEmail, sendPasswordResetEmail };
