@@ -1,20 +1,28 @@
 // backend/controllers/auth.controller.js
-const bcrypt          = require('bcryptjs');
-const jwt             = require('jsonwebtoken');
-const crypto          = require('crypto');
-const UserDAO         = require('../dao/user.dao');
-const NotificationDAO = require('../dao/notification.dao');
-const TempCodesDAO    = require('../dao/tempCodes.dao');
+const bcrypt           = require('bcryptjs');
+const jwt              = require('jsonwebtoken');
+const nodemailer       = require('nodemailer');
+const UserDAO          = require('../dao/user.dao');
+const NotificationDAO  = require('../dao/notification.dao');
+const TempCodesDAO     = require('../dao/tempCodes.dao');
 const { logConnexion } = require('../middleware/auth.middleware');
-const { Resend }      = require('resend');
 
-const resend = new Resend(process.env.RESEND_API_KEY);
-const FROM   = 'Bazar Guyane <onboarding@resend.dev>';
+// ── Transporteur Brevo ────────────────────────────────────────
+const createTransporter = () => nodemailer.createTransport({
+  host:   'smtp-relay.brevo.com',
+  port:   587,
+  secure: false,
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
+  },
+});
 
 // ── Helpers email ─────────────────────────────────────────────
 async function sendVerificationEmail({ to, nom, code }) {
-  await resend.emails.send({
-    from: FROM,
+  const transporter = createTransporter();
+  await transporter.sendMail({
+    from:    `"Bazar Guyane" <${process.env.EMAIL_FROM}>`,
     to,
     subject: 'Bienvenue sur Bazar Guyane — Vérifiez votre email',
     html: `
@@ -36,8 +44,9 @@ async function sendVerificationEmail({ to, nom, code }) {
 }
 
 async function sendPasswordResetEmail({ to, nom, code }) {
-  await resend.emails.send({
-    from: FROM,
+  const transporter = createTransporter();
+  await transporter.sendMail({
+    from:    `"Bazar Guyane" <${process.env.EMAIL_USER}>`,
     to,
     subject: 'Réinitialisation de votre mot de passe — Bazar Guyane',
     html: `
@@ -58,7 +67,6 @@ async function sendPasswordResetEmail({ to, nom, code }) {
   });
 }
 
-// ── Controller ────────────────────────────────────────────────
 const AuthController = {
 
   async register(req, res) {
@@ -77,8 +85,8 @@ const AuthController = {
       if (mot_de_passe.length < 8)
         return res.status(400).json({ success: false, message: 'Mot de passe minimum 8 caractères' });
 
-      const hash     = await bcrypt.hash(mot_de_passe, 12);
-      const code     = Math.floor(100000 + Math.random() * 900000).toString();
+      const hash      = await bcrypt.hash(mot_de_passe, 12);
+      const code      = Math.floor(100000 + Math.random() * 900000).toString();
       const expiresAt = new Date(Date.now() + 15 * 60 * 1000);
 
       await TempCodesDAO.saveEmailVerification({
@@ -202,7 +210,7 @@ const AuthController = {
       return res.json({ success: true, message: 'Code de réinitialisation envoyé.' });
     } catch (err) {
       console.error('motDePasseOublie:', err);
-      return res.status(500).json({ success: false, message: 'Erreur lors de l\'envoi' });
+      return res.status(500).json({ success: false, message: "Erreur lors de l'envoi" });
     }
   },
 
