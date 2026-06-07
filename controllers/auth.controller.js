@@ -36,6 +36,8 @@ async function sendEmail({ to, toName, subject, html }) {
   });
 
   const data = await response.json();
+  console.log('📧 Mailjet status:', response.status);
+  console.log('📧 Mailjet response:', JSON.stringify(data));
   if (!response.ok) {
     throw new Error(`Mailjet error: ${JSON.stringify(data)}`);
   }
