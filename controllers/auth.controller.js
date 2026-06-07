@@ -1,29 +1,46 @@
 // backend/controllers/auth.controller.js
 const bcrypt           = require('bcryptjs');
 const jwt              = require('jsonwebtoken');
-const nodemailer       = require('nodemailer');
 const UserDAO          = require('../dao/user.dao');
 const NotificationDAO  = require('../dao/notification.dao');
 const TempCodesDAO     = require('../dao/tempCodes.dao');
 const { logConnexion } = require('../middleware/auth.middleware');
 
-// ── Transporteur Brevo ────────────────────────────────────────
-const createTransporter = () => nodemailer.createTransport({
-  host:   'in-v3.mailjet.com',
-  port:   443,
-  secure: true,
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
-  },
-});
+// ── Mailjet API HTTP (pas SMTP) ───────────────────────────────
+async function sendEmail({ to, toName, subject, html }) {
+  const response = await fetch('https://api.mailjet.com/v3.1/send', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Basic ' + Buffer.from(
+        `${process.env.EMAIL_USER}:${process.env.EMAIL_PASS}`
+      ).toString('base64'),
+    },
+    body: JSON.stringify({
+      Messages: [{
+        From: {
+          Email: process.env.EMAIL_FROM || process.env.EMAIL_USER,
+          Name:  'Bazar Guyane',
+        },
+        To: [{ Email: to, Name: toName || to }],
+        Subject: subject,
+        HTMLPart: html,
+      }],
+    }),
+  });
+
+  const data = await response.json();
+  if (!response.ok) {
+    throw new Error(`Mailjet error: ${JSON.stringify(data)}`);
+  }
+  return data;
+}
 
 // ── Helpers email ─────────────────────────────────────────────
 async function sendVerificationEmail({ to, nom, code }) {
-  const transporter = createTransporter();
-  await transporter.sendMail({
-    from:    `"Bazar Guyane" <${process.env.EMAIL_FROM}>`,
+  await sendEmail({
     to,
+    toName: nom,
     subject: 'Bienvenue sur Bazar Guyane — Vérifiez votre email',
     html: `
       <div style="font-family:Arial,sans-serif;max-width:500px;margin:auto;padding:20px;border:1px solid #e5e7eb;border-radius:16px;">
@@ -44,10 +61,9 @@ async function sendVerificationEmail({ to, nom, code }) {
 }
 
 async function sendPasswordResetEmail({ to, nom, code }) {
-  const transporter = createTransporter();
-  await transporter.sendMail({
-    from:    `"Bazar Guyane" <${process.env.EMAIL_USER}>`,
+  await sendEmail({
     to,
+    toName: nom,
     subject: 'Réinitialisation de votre mot de passe — Bazar Guyane',
     html: `
       <div style="font-family:Arial,sans-serif;max-width:500px;margin:auto;padding:20px;border:1px solid #e5e7eb;border-radius:16px;">
@@ -67,6 +83,7 @@ async function sendPasswordResetEmail({ to, nom, code }) {
   });
 }
 
+// ── Controller ────────────────────────────────────────────────
 const AuthController = {
 
   async register(req, res) {
