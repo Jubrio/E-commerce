@@ -44,7 +44,6 @@ const StockDAO = {
     } finally { conn.release(); }
   },
 
-  // Produits dont le stock est en dessous d'un seuil
   async alerteStock(seuil=5) {
     const [rows] = await pool.query(
       `SELECT p.id, p.nom, p.stock, u.nom AS vendeur_nom, u.email AS vendeur_email

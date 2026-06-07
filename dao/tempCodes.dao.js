@@ -1,7 +1,6 @@
 const pool = require('../db/connection');
 
 const TempCodesDAO = {
-  // ---- Email verification ----
   async saveEmailVerification({ code, email, nom, prenom, telephone, mot_de_passe_hash, expiresAt }) {
     const [result] = await pool.query(
       `INSERT INTO email_verifications (code, email, nom, prenom, telephone, mot_de_passe_hash, expires_at)
@@ -27,7 +26,6 @@ const TempCodesDAO = {
     await pool.query('DELETE FROM email_verifications WHERE expires_at <= NOW()');
   },
 
-  // ---- Password reset ----
   async savePasswordReset({ code, userId, expiresAt }) {
     const [result] = await pool.query(
       'INSERT INTO password_resets (code, user_id, expires_at) VALUES (?, ?, ?)',

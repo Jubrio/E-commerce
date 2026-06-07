@@ -3,7 +3,6 @@ const pool    = require('../db/connection');
 const { verifyToken, isAdmin } = require('../middleware/auth.middleware');
 const router  = express.Router();
 
-// GET /api/avis?produit_id=X — public
 router.get('/', async (req, res) => {
   try {
     const { produit_id } = req.query;
@@ -17,7 +16,6 @@ router.get('/', async (req, res) => {
   } catch { return res.status(500).json({ success: false, message: 'Erreur serveur' }); }
 });
 
-// POST /api/avis — client connecté
 router.post('/', verifyToken, async (req, res) => {
   try {
     const { produit_id, note, titre, commentaire } = req.body;
@@ -36,7 +34,6 @@ router.post('/', verifyToken, async (req, res) => {
   }
 });
 
-// PUT /api/avis/:id/verifier — admin marque l'avis comme vérifié
 router.put('/:id/verifier', verifyToken, isAdmin, async (req, res) => {
   try {
     await pool.query('UPDATE avis SET verifie=TRUE WHERE id=?', [req.params.id]);
@@ -44,7 +41,6 @@ router.put('/:id/verifier', verifyToken, isAdmin, async (req, res) => {
   } catch { return res.status(500).json({ success: false, message: 'Erreur serveur' }); }
 });
 
-// DELETE /api/avis/:id — admin ou auteur
 router.delete('/:id', verifyToken, async (req, res) => {
   try {
     const [[avis]] = await pool.query('SELECT user_id FROM avis WHERE id=?', [req.params.id]);

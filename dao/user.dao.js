@@ -1,7 +1,3 @@
-// backend/dao/user.dao.js — FIX photo profil
-// Problème : update() recevait photo_profil=undefined et écrasait la photo en NULL
-// Fix : on met à jour seulement les champs fournis
-
 const pool = require('../db/connection');
 
 const UserDAO = {
@@ -30,7 +26,6 @@ const UserDAO = {
     return r.insertId;
   },
 
-  // FIX : met à jour SEULEMENT les champs fournis, ne touche pas photo_profil
   async update(id, { nom, prenom, telephone }) {
     const parts  = [];
     const values = [];
@@ -39,7 +34,7 @@ const UserDAO = {
     if (prenom    !== undefined) { parts.push('prenom = ?');    values.push(prenom); }
     if (telephone !== undefined) { parts.push('telephone = ?'); values.push(telephone); }
 
-    if (parts.length === 0) return true; // rien à mettre à jour
+    if (parts.length === 0) return true; 
 
     values.push(id);
     const [r] = await pool.query(
@@ -47,7 +42,6 @@ const UserDAO = {
     return r.affectedRows > 0;
   },
 
-  // Méthode séparée pour la photo (appelée uniquement via /api/upload/profil)
   async updatePhoto(id, photo_profil) {
     const [r] = await pool.query(
       'UPDATE users SET photo_profil = ? WHERE id = ?', [photo_profil, id]);

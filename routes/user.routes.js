@@ -1,6 +1,3 @@
-// backend/routes/user.routes.js — VERSION CORRIGÉE
-// Ajout : admin peut créer un compte vendeur ou client
-
 const express   = require('express');
 const bcrypt    = require('bcryptjs');
 const UserDAO   = require('../dao/user.dao');
@@ -9,7 +6,6 @@ const router    = express.Router();
 
 router.use(verifyToken);
 
-// GET /api/users/profil
 router.get('/profil', async (req, res) => {
   try {
     const user = await UserDAO.findById(req.user.id);
@@ -18,7 +14,6 @@ router.get('/profil', async (req, res) => {
   } catch { return res.status(500).json({ success: false, message: 'Erreur serveur' }); }
 });
 
-// PUT /api/users/profil
 router.put('/profil', async (req, res) => {
   try {
     await UserDAO.update(req.user.id, req.body);
@@ -26,7 +21,6 @@ router.put('/profil', async (req, res) => {
   } catch { return res.status(500).json({ success: false, message: 'Erreur serveur' }); }
 });
 
-// PUT /api/users/mot-de-passe
 router.put('/mot-de-passe', async (req, res) => {
   try {
     const { ancien, nouveau } = req.body;
@@ -41,7 +35,6 @@ router.put('/mot-de-passe', async (req, res) => {
   } catch { return res.status(500).json({ success: false, message: 'Erreur serveur' }); }
 });
 
-// GET /api/users — admin
 router.get('/', isAdmin, async (req, res) => {
   try {
     const result = await UserDAO.findAll(req.query);
@@ -49,15 +42,12 @@ router.get('/', isAdmin, async (req, res) => {
   } catch { return res.status(500).json({ success: false, message: 'Erreur serveur' }); }
 });
 
-// POST /api/users/creer — admin crée un compte vendeur ou client
 router.post('/creer', isAdmin, async (req, res) => {
   try {
     const { nom, prenom, email, telephone, mot_de_passe, role_id } = req.body;
 
     if (!nom || !email || !mot_de_passe)
       return res.status(400).json({ success: false, message: 'Nom, email et mot de passe requis' });
-
-    // role_id : 2 = vendeur, 3 = client (admin ne peut pas créer un autre admin)
     const roleValide = [2, 3].includes(parseInt(role_id));
     if (!roleValide)
       return res.status(400).json({ success: false, message: 'Rôle invalide (2=vendeur, 3=client)' });
@@ -76,7 +66,6 @@ router.post('/creer', isAdmin, async (req, res) => {
   }
 });
 
-// PUT /api/users/:id/desactiver — admin
 router.put('/:id/desactiver', isAdmin, async (req, res) => {
   try {
     await UserDAO.desactiver(req.params.id);
@@ -84,7 +73,6 @@ router.put('/:id/desactiver', isAdmin, async (req, res) => {
   } catch { return res.status(500).json({ success: false, message: 'Erreur serveur' }); }
 });
 
-// PUT /api/users/:id/reactiver — admin
 router.put('/:id/reactiver', isAdmin, async (req, res) => {
   try {
     const pool = require('../db/connection');

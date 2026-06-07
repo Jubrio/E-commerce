@@ -5,7 +5,6 @@ const router      = express.Router();
 
 router.use(verifyToken);
 
-// GET /api/messages/conversations
 router.get('/conversations', async (req, res) => {
   try {
     const rows = await MessageDAO.findConversations(req.user.id);
@@ -13,7 +12,6 @@ router.get('/conversations', async (req, res) => {
   } catch { return res.status(500).json({ success: false, message: 'Erreur serveur' }); }
 });
 
-// GET /api/messages/:interlocuteur_id
 router.get('/:interlocuteur_id', async (req, res) => {
   try {
     const rows = await MessageDAO.findMessages(req.user.id, req.params.interlocuteur_id, req.query);
@@ -21,7 +19,6 @@ router.get('/:interlocuteur_id', async (req, res) => {
   } catch { return res.status(500).json({ success: false, message: 'Erreur serveur' }); }
 });
 
-// POST /api/messages — envoyer un message
 router.post('/', async (req, res) => {
   try {
     const { destinataire_id, message, commande_id } = req.body;
@@ -34,7 +31,6 @@ router.post('/', async (req, res) => {
   } catch { return res.status(500).json({ success: false, message: 'Erreur serveur' }); }
 });
 
-// GET /api/messages/non-lus/count
 router.get('/non-lus/count', async (req, res) => {
   try {
     const total = await MessageDAO.countNonLus(req.user.id);

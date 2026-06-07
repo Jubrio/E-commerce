@@ -19,10 +19,9 @@ const PanierController = {
     if (!produit || !produit.actif) return res.status(404).json({ success: false, message: 'Produit introuvable' });
     if (produit.stock < quantite) return res.status(409).json({ success: false, message: 'Stock insuffisant' });
 
-    // Conversion robuste du prix
     let prix = produit.prix;
     if (typeof prix === 'string') {
-      prix = prix.replace(',', '.'); // pour gérer les virgules françaises
+      prix = prix.replace(',', '.'); 
     }
     prix = parseFloat(prix);
     if (isNaN(prix)) {

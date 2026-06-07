@@ -45,8 +45,8 @@ router.post('/', async (req, res) => {
     });
 
     const data = await response.json();
-    console.log('📧 Contact Mailjet status:', response.status);
-    console.log('📧 Contact Mailjet response:', JSON.stringify(data));
+    console.log(' Contact Mailjet status:', response.status);
+    console.log(' Contact Mailjet response:', JSON.stringify(data));
 
     if (!response.ok) {
       throw new Error(`Mailjet error: ${JSON.stringify(data)}`);

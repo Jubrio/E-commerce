@@ -33,10 +33,8 @@ const CommandeDAO = {
           [item.produit_id, item.quantite, commande_id]);
       }
 
-      // Fiche livraison
       await conn.query('INSERT INTO livraisons (commande_id, statut) VALUES (?,"preparation")', [commande_id]);
 
-      // Commission vendeur (taux configurable)
       const taux = parseFloat(process.env.COMMISSION_TAUX || 5);
       for (const item of items) {
         const montant_vente = item.prix * item.quantite;

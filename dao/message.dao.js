@@ -1,7 +1,6 @@
 const pool = require('../db/connection');
 
 const MessageDAO = {
-  // Conversations d'un user (groupées par interlocuteur)
   async findConversations(user_id) {
     const [rows] = await pool.query(
       `SELECT
@@ -18,7 +17,6 @@ const MessageDAO = {
     return rows;
   },
 
-  // Messages entre deux users
   async findMessages(user_id, interlocuteur_id, { page=1, limit=50 } = {}) {
     const offset = (page-1)*limit;
     const [rows] = await pool.query(
@@ -29,7 +27,6 @@ const MessageDAO = {
        ORDER BY m.created_at ASC LIMIT ? OFFSET ?`,
       [user_id, interlocuteur_id, interlocuteur_id, user_id, limit, offset]);
 
-    // Marquer comme lus
     await pool.query(
       'UPDATE messages SET lu=TRUE WHERE destinataire_id=? AND expediteur_id=? AND lu=FALSE',
       [user_id, interlocuteur_id]);

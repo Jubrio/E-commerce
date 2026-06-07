@@ -1,10 +1,3 @@
-// backend/server.js — MIS À JOUR avec Google OAuth
-// AJOUTER au .env :
-//   GOOGLE_CLIENT_ID=votre_client_id.apps.googleusercontent.com
-//   GOOGLE_CLIENT_SECRET=votre_secret
-//   BACKEND_URL=http://localhost:4000
-// INSTALLER : npm install passport passport-google-oauth20
-
 require('dotenv').config();
 const express  = require('express');
 const cors     = require('cors');
@@ -52,7 +45,7 @@ setInterval(async () => {
   try {
     await TempCodesDAO.deleteExpiredEmailVerifications();
     await TempCodesDAO.deleteExpiredPasswordResets();
-    console.log('✅ Nettoyage des codes OTP expirés effectué');
+    console.log('✓ Nettoyage des codes OTP expirés effectué');
   } catch (err) {
     console.error('Erreur nettoyage OTP:', err);
   }
@@ -75,4 +68,4 @@ app.use((err, req, res, next) => {
 });
 
 const PORT = process.env.PORT || 4000;
-app.listen(PORT, () => console.log(`🚀 Bazar Guyane API v3 — http://localhost:${PORT}`));
+app.listen(PORT, () => console.log(`✓ Bazar Guyane API v3 — http://localhost:${PORT}`));

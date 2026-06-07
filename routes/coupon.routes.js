@@ -3,7 +3,6 @@ const CouponDAO  = require('../dao/coupon.dao');
 const { verifyToken, isAdmin } = require('../middleware/auth.middleware');
 const router     = express.Router();
 
-// POST /api/coupons/verifier — client connecté vérifie un coupon
 router.post('/verifier', verifyToken, async (req, res) => {
   try {
     const { code, total } = req.body;
@@ -23,7 +22,6 @@ router.post('/verifier', verifyToken, async (req, res) => {
   } catch { return res.status(500).json({ success: false, message: 'Erreur serveur' }); }
 });
 
-// GET /api/coupons — admin
 router.get('/', verifyToken, isAdmin, async (req, res) => {
   try {
     const rows = await CouponDAO.findAll();
@@ -31,7 +29,6 @@ router.get('/', verifyToken, isAdmin, async (req, res) => {
   } catch { return res.status(500).json({ success: false, message: 'Erreur serveur' }); }
 });
 
-// POST /api/coupons — admin
 router.post('/', verifyToken, isAdmin, async (req, res) => {
   try {
     const { code, type_reduction, reduction, minimum_commande, usage_max, expiration } = req.body;
@@ -46,7 +43,6 @@ router.post('/', verifyToken, isAdmin, async (req, res) => {
   }
 });
 
-// PUT /api/coupons/:id — admin
 router.put('/:id', verifyToken, isAdmin, async (req, res) => {
   try {
     await CouponDAO.update(req.params.id, req.body);

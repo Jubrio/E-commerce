@@ -1,4 +1,3 @@
-// backend/routes/auth.routes.js — VERSION COMPLÈTE avec mot de passe oublié
 const express        = require('express');
 const router         = express.Router();
 const AuthController = require('../controllers/auth.controller');

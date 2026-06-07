@@ -4,7 +4,6 @@ const CommandeDAO  = require('../dao/commande.dao');
 const { verifyToken, isAdmin } = require('../middleware/auth.middleware');
 const router       = express.Router();
 
-// GET /api/paiements/commande/:id — client voit ses paiements
 router.get('/commande/:id', verifyToken, async (req, res) => {
   try {
     const commande = await CommandeDAO.findById(req.params.id);
@@ -16,7 +15,6 @@ router.get('/commande/:id', verifyToken, async (req, res) => {
   } catch { return res.status(500).json({ success: false, message: 'Erreur serveur' }); }
 });
 
-// POST /api/paiements/stripe/checkout — créer session Stripe
 router.post('/stripe/checkout', verifyToken, async (req, res) => {
   try {
     const stripe     = require('stripe')(process.env.STRIPE_SECRET_KEY);
@@ -38,7 +36,6 @@ router.post('/stripe/checkout', verifyToken, async (req, res) => {
       metadata:    { commande_id: String(commande_id), user_id: String(req.user.id) },
     });
 
-    // Enregistrer le paiement en attente
     await PaiementDAO.create({
       commande_id,
       montant:        req.body.total,
@@ -53,8 +50,6 @@ router.post('/stripe/checkout', verifyToken, async (req, res) => {
     return res.status(500).json({ success: false, message: 'Erreur Stripe' });
   }
 });
-
-// POST /api/paiements/stripe/webhook — Stripe nous notifie
 
 router.post('/stripe/webhook',
   require('express').raw({ type: 'application/json' }),
@@ -72,8 +67,6 @@ router.post('/stripe/webhook',
       if (event.type === 'checkout.session.completed') {
         const session     = event.data.object;
         const commande_id = session.metadata.commande_id;
-
-        // Mettre à jour paiement et commande
         await PaiementDAO.updateStatutByTransaction(session.id, 'reussi', session);
         await CommandeDAO.updateStatut(commande_id, 'payee');
       }
@@ -90,8 +83,7 @@ router.post('/stripe/webhook',
     }
   }
 ); 
- 
-// GET /api/paiements — admin
+
 router.get('/', verifyToken, isAdmin, async (req, res) => {
   try {
     const [rows] = require('../db/connection').query(

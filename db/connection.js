@@ -20,12 +20,11 @@ const pool = mysql.createPool({
 
 pool.getConnection()
   .then(conn => {
-    console.log('✅ MySQL connecté');
+    console.log('✓ MySQL connecté');
     conn.release();
   })
   .catch(err => {
-    console.error('❌ Erreur MySQL complète :', err.message);
-    // process.exit(1);  // commenté pour ne pas crasher
+    console.error('✕ Erreur MySQL complète :', err.message);
   });
 
 module.exports = pool;

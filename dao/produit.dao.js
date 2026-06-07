@@ -1,4 +1,3 @@
-// backend/dao/produit.dao.js — VERSION CORRIGÉE (avec inclusion des sous‑catégories)
 const pool = require('../db/connection');
 
 const SORT_ALLOWED = {
@@ -8,8 +7,6 @@ const SORT_ALLOWED = {
 };
 
 const ProduitDAO = {
-
-  // ── Récupère tous les IDs d’une catégorie et de ses descendants ──
   async _getAllCategoryIds(id) {
     const ids = [parseInt(id)];
     let current = [parseInt(id)];
@@ -32,8 +29,6 @@ const ProduitDAO = {
     const conditions = [];
 
     if (!includeInactif) conditions.push('p.actif = TRUE');
-
-    // ── Gestion des catégories avec héritage ──
     if (category_id) {
       const allIds = await this._getAllCategoryIds(category_id);
       conditions.push(`p.category_id IN (${allIds.map(() => '?').join(', ')})`);
@@ -46,8 +41,6 @@ const ProduitDAO = {
     if (prix_min)    conditions.push('p.prix >= ?');
     if (prix_max)    conditions.push('p.prix <= ?');
     if (search)      conditions.push('p.nom LIKE ?');
-
-    // Ajout des paramètres (sauf pour category_id déjà géré)
     if (marque_id)   params.push(marque_id);
     if (vendeur_id)  params.push(vendeur_id);
     if (etat)        params.push(etat);
@@ -130,7 +123,6 @@ const ProduitDAO = {
     );
     return r.insertId;
   },
-  // À la fin du DAO, ajouter :
   async updateSku(id, sku) {
   const [r] = await pool.query('UPDATE produits SET sku = ? WHERE id = ?', [sku, id]);
   return r.affectedRows > 0;
@@ -183,12 +175,10 @@ const ProduitDAO = {
   return r.affectedRows > 0;
 },
 async deleteDefinitif(id) {
-  // Supprimer les dépendances (ordre important)
   await pool.query('DELETE FROM produit_images WHERE produit_id = ?', [id]);
   await pool.query('DELETE FROM produit_specifications WHERE produit_id = ?', [id]);
   await pool.query('DELETE FROM avis WHERE produit_id = ?', [id]);
   await pool.query('DELETE FROM promotions WHERE produit_id = ?', [id]);
-  // Supprimer le produit lui-même
   const [r] = await pool.query('DELETE FROM produits WHERE id = ?', [id]);
   return r.affectedRows > 0;
 }

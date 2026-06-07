@@ -5,7 +5,6 @@ const router      = express.Router();
 
 router.use(verifyToken);
 
-// GET /api/adresses — mes adresses
 router.get('/', async (req, res) => {
   try {
     const rows = await AdresseDAO.findByUser(req.user.id);
@@ -13,7 +12,6 @@ router.get('/', async (req, res) => {
   } catch { return res.status(500).json({ success: false, message: 'Erreur serveur' }); }
 });
 
-// POST /api/adresses — ajouter une adresse
 router.post('/', async (req, res) => {
   try {
     const id = await AdresseDAO.create(req.user.id, req.body);
@@ -21,7 +19,6 @@ router.post('/', async (req, res) => {
   } catch { return res.status(500).json({ success: false, message: 'Erreur serveur' }); }
 });
 
-// PUT /api/adresses/:id
 router.put('/:id', async (req, res) => {
   try {
     const adresse = await AdresseDAO.findById(req.params.id);
@@ -33,7 +30,6 @@ router.put('/:id', async (req, res) => {
   } catch { return res.status(500).json({ success: false, message: 'Erreur serveur' }); }
 });
 
-// PUT /api/adresses/:id/defaut — définir comme adresse par défaut
 router.put('/:id/defaut', async (req, res) => {
   try {
     await AdresseDAO.setDefaut(req.params.id, req.user.id);
@@ -41,7 +37,6 @@ router.put('/:id/defaut', async (req, res) => {
   } catch { return res.status(500).json({ success: false, message: 'Erreur serveur' }); }
 });
 
-// DELETE /api/adresses/:id
 router.delete('/:id', async (req, res) => {
   try {
     const adresse = await AdresseDAO.findById(req.params.id);

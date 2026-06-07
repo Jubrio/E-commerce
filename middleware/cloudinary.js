@@ -1,6 +1,3 @@
-// backend/middleware/cloudinary.js
-// npm install cloudinary multer-storage-cloudinary multer
-
 const cloudinary        = require('cloudinary').v2;
 const { CloudinaryStorage } = require('multer-storage-cloudinary');
 const multer            = require('multer');
@@ -33,7 +30,7 @@ const profilStorage = new CloudinaryStorage({
 
 const uploadProduit = multer({
   storage: produitStorage,
-  limits:  { fileSize: 5 * 1024 * 1024 }, // 5 Mo max
+  limits:  { fileSize: 5 * 1024 * 1024 }, 
   fileFilter: (req, file, cb) => {
     if (file.mimetype.startsWith('image/')) cb(null, true);
     else cb(new Error('Seules les images sont acceptées'), false);
@@ -45,7 +42,6 @@ const uploadProfil = multer({
   limits:  { fileSize: 2 * 1024 * 1024 },
 });
 
-// ── Supprimer une image Cloudinary par son URL public_id ────
 const deleteImage = async (imageUrl) => {
   try {
     const parts    = imageUrl.split('/');

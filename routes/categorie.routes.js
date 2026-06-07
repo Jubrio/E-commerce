@@ -3,7 +3,6 @@ const pool    = require('../db/connection');
 const { verifyToken, isAdmin } = require('../middleware/auth.middleware');
 const router  = express.Router();
 
-// GET /api/categories — public
 router.get('/', async (req, res) => {
   try {
     const [rows] = await pool.query(
@@ -15,7 +14,6 @@ router.get('/', async (req, res) => {
   } catch { return res.status(500).json({ success: false, message: 'Erreur serveur' }); }
 });
 
-// GET /api/categories/:id — public
 router.get('/:id', async (req, res) => {
   try {
     const [[cat]] = await pool.query('SELECT * FROM categories WHERE id=? LIMIT 1', [req.params.id]);
@@ -24,7 +22,6 @@ router.get('/:id', async (req, res) => {
   } catch { return res.status(500).json({ success: false, message: 'Erreur serveur' }); }
 });
 
-// POST /api/categories — admin
 router.post('/', verifyToken, isAdmin, async (req, res) => {
   try {
     const { nom, slug, description, image, parent_id } = req.body;
@@ -40,7 +37,6 @@ router.post('/', verifyToken, isAdmin, async (req, res) => {
   }
 });
 
-// PUT /api/categories/:id — admin
 router.put('/:id', verifyToken, isAdmin, async (req, res) => {
   try {
     const { nom, slug, description, image, parent_id } = req.body;
@@ -51,7 +47,6 @@ router.put('/:id', verifyToken, isAdmin, async (req, res) => {
   } catch { return res.status(500).json({ success: false, message: 'Erreur serveur' }); }
 });
 
-// DELETE /api/categories/:id — admin
 router.delete('/:id', verifyToken, isAdmin, async (req, res) => {
   try {
     await pool.query('DELETE FROM categories WHERE id=?', [req.params.id]);

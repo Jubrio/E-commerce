@@ -3,7 +3,6 @@ const CommissionDAO = require('../dao/commission.dao');
 const { verifyToken, isAdmin, isVendeur } = require('../middleware/auth.middleware');
 const router        = express.Router();
 
-// GET /api/commissions/mes-commissions — vendeur
 router.get('/mes-commissions', verifyToken, isVendeur, async (req, res) => {
   try {
     const rows  = await CommissionDAO.findByVendeur(req.user.id, req.query);
@@ -12,7 +11,6 @@ router.get('/mes-commissions', verifyToken, isVendeur, async (req, res) => {
   } catch { return res.status(500).json({ success: false, message: 'Erreur serveur' }); }
 });
 
-// GET /api/commissions — admin : toutes les commissions
 router.get('/', verifyToken, isAdmin, async (req, res) => {
   try {
     const rows = await CommissionDAO.findAll(req.query);
@@ -20,7 +18,6 @@ router.get('/', verifyToken, isAdmin, async (req, res) => {
   } catch { return res.status(500).json({ success: false, message: 'Erreur serveur' }); }
 });
 
-// PUT /api/commissions/:id/verser — admin marque comme versée
 router.put('/:id/verser', verifyToken, isAdmin, async (req, res) => {
   try {
     await CommissionDAO.marquerVersee(req.params.id);

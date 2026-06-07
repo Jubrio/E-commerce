@@ -1,12 +1,9 @@
-// backend/routes/upload.routes.js
 const express              = require('express');
 const { uploadProduit, uploadProfil, deleteImage } = require('../middleware/cloudinary');
 const { verifyToken, isVendeur } = require('../middleware/auth.middleware');
 const pool                 = require('../db/connection');
 const router               = express.Router();
 
-// ── POST /api/upload/produit/:id/images ─────────────────────
-// Uploader 1 à 5 images pour un produit
 router.post(
   '/produit/:id/images',
   verifyToken,
@@ -21,15 +18,12 @@ router.post(
       if (!files || files.length === 0) {
         return res.status(400).json({ success: false, message: 'Aucun fichier reçu' });
       }
-
-      // Si première image ou demande principale → reset les autres
       if (estPrincipale) {
         await pool.query(
           'UPDATE produit_images SET est_principale = FALSE WHERE produit_id = ?',
           [produit_id]
         );
       }
-
       const inserted = [];
       for (let i = 0; i < files.length; i++) {
         const file = files[i];
@@ -48,7 +42,6 @@ router.post(
   }
 );
 
-// ── DELETE /api/upload/produit/image/:image_id ──────────────
 router.delete('/produit/image/:image_id', verifyToken, isVendeur, async (req, res) => {
   try {
     const [[img]] = await pool.query(
@@ -65,7 +58,6 @@ router.delete('/produit/image/:image_id', verifyToken, isVendeur, async (req, re
   }
 });
 
-// ── POST /api/upload/profil ─────────────────────────────────
 router.post('/profil', verifyToken, uploadProfil.single('photo'), async (req, res) => {
   try {
     if (!req.file) return res.status(400).json({ success: false, message: 'Aucun fichier' });

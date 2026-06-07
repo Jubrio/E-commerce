@@ -3,7 +3,6 @@ const StockDAO  = require('../dao/stock.dao');
 const { verifyToken, isAdmin, isVendeur } = require('../middleware/auth.middleware');
 const router    = express.Router();
 
-// GET /api/stock/alertes — vendeur / admin
 router.get('/alertes', verifyToken, isVendeur, async (req, res) => {
   try {
     const seuil = parseInt(req.query.seuil) || 5;
@@ -12,7 +11,6 @@ router.get('/alertes', verifyToken, isVendeur, async (req, res) => {
   } catch { return res.status(500).json({ success: false, message: 'Erreur serveur' }); }
 });
 
-// GET /api/stock/produit/:id — vendeur / admin
 router.get('/produit/:id', verifyToken, isVendeur, async (req, res) => {
   try {
     const rows = await StockDAO.findByProduit(req.params.id, req.query);
@@ -20,7 +18,6 @@ router.get('/produit/:id', verifyToken, isVendeur, async (req, res) => {
   } catch { return res.status(500).json({ success: false, message: 'Erreur serveur' }); }
 });
 
-// POST /api/stock/produit/:id/entree — vendeur / admin
 router.post('/produit/:id/entree', verifyToken, isVendeur, async (req, res) => {
   try {
     const { quantite, raison } = req.body;
@@ -31,7 +28,6 @@ router.post('/produit/:id/entree', verifyToken, isVendeur, async (req, res) => {
   } catch { return res.status(500).json({ success: false, message: 'Erreur serveur' }); }
 });
 
-// POST /api/stock/produit/:id/ajustement — admin
 router.post('/produit/:id/ajustement', verifyToken, isAdmin, async (req, res) => {
   try {
     const { nouveau_stock, raison } = req.body;

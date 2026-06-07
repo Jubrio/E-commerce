@@ -1,4 +1,3 @@
-// backend/routes/notification.routes.js — VERSION CORRIGÉE
 const express         = require('express');
 const NotificationDAO = require('../dao/notification.dao');
 const { verifyToken } = require('../middleware/auth.middleware');
@@ -6,7 +5,6 @@ const router          = express.Router();
 
 router.use(verifyToken);
 
-// GET /api/notifications
 router.get('/', async (req, res) => {
   try {
     const { page = 1, limit = 20 } = req.query;
@@ -19,7 +17,6 @@ router.get('/', async (req, res) => {
   }
 });
 
-// PUT /api/notifications/lire-tout — DOIT ÊTRE AVANT /:id/lire
 router.put('/lire-tout', async (req, res) => {
   try {
     await NotificationDAO.marquerToutLu(req.user.id);
@@ -30,7 +27,6 @@ router.put('/lire-tout', async (req, res) => {
   }
 });
 
-// PUT /api/notifications/:id/lire
 router.put('/:id/lire', async (req, res) => {
   try {
     await NotificationDAO.marquerLu(req.params.id, req.user.id);
@@ -40,7 +36,6 @@ router.put('/:id/lire', async (req, res) => {
   }
 });
 
-// DELETE /api/notifications/:id
 router.delete('/:id', async (req, res) => {
   try {
     await NotificationDAO.delete(req.params.id, req.user.id);

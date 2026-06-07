@@ -36,7 +36,6 @@ const PromotionDAO = {
     return r.affectedRows > 0;
   },
 
-  // Prix après promotion
   prixApresPromo(prix, pourcentage) {
     return parseFloat((prix * (1 - pourcentage / 100)).toFixed(2));
   },

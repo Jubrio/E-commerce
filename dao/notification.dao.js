@@ -1,5 +1,3 @@
-// backend/dao/notification.dao.js — VERSION CORRIGÉE
-// Erreur 500 causée par une syntaxe SQL incorrecte dans findByUser
 const pool = require('../db/connection');
 
 const NotificationDAO = {

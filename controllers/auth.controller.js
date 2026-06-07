@@ -1,4 +1,3 @@
-// backend/controllers/auth.controller.js
 const bcrypt           = require('bcryptjs');
 const jwt              = require('jsonwebtoken');
 const UserDAO          = require('../dao/user.dao');
@@ -6,13 +5,12 @@ const NotificationDAO  = require('../dao/notification.dao');
 const TempCodesDAO     = require('../dao/tempCodes.dao');
 const { logConnexion } = require('../middleware/auth.middleware');
 
-// ── Mailjet API HTTP (pas SMTP) ───────────────────────────────
 async function sendEmail({ to, toName, subject, html }) {
 
-  console.log('📧 Envoi email via Mailjet API à:', to);
-  console.log('📧 EMAIL_USER:', process.env.EMAIL_USER ? 'défini' : 'MANQUANT');
-  console.log('📧 EMAIL_PASS:', process.env.EMAIL_PASS ? 'défini' : 'MANQUANT');
-  console.log('📧 EMAIL_FROM:', process.env.EMAIL_FROM || 'MANQUANT');
+  console.log(' Envoi email via Mailjet API à:', to);
+  console.log(' EMAIL_USER:', process.env.EMAIL_USER ? 'défini' : 'MANQUANT');
+  console.log(' EMAIL_PASS:', process.env.EMAIL_PASS ? 'défini' : 'MANQUANT');
+  console.log(' EMAIL_FROM:', process.env.EMAIL_FROM || 'MANQUANT');
 
   const response = await fetch('https://api.mailjet.com/v3.1/send', {
     method: 'POST',
@@ -36,15 +34,14 @@ async function sendEmail({ to, toName, subject, html }) {
   });
 
   const data = await response.json();
-  console.log('📧 Mailjet status:', response.status);
-  console.log('📧 Mailjet response:', JSON.stringify(data));
+  console.log(' EMAIL Mailjet status:', response.status);
+  console.log(' EMAIL Mailjet response:', JSON.stringify(data));
   if (!response.ok) {
     throw new Error(`Mailjet error: ${JSON.stringify(data)}`);
   }
   return data;
 }
 
-// ── Helpers email ─────────────────────────────────────────────
 async function sendVerificationEmail({ to, nom, code }) {
 
   await sendEmail({
@@ -92,7 +89,6 @@ async function sendPasswordResetEmail({ to, nom, code }) {
   });
 }
 
-// ── Controller ────────────────────────────────────────────────
 const AuthController = {
 
   async register(req, res) {

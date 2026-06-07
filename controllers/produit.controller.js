@@ -1,4 +1,3 @@
-// backend/controllers/produit.controller.js — CORRIGÉ
 const ProduitDAO = require('../dao/produit.dao');
 
 const ProduitController = {
@@ -10,17 +9,14 @@ const ProduitController = {
     let includeInactif = false;
 
     if (req.user && req.user.role_id === 1) {
-      // Admin : voit tout (même inactifs)
       includeInactif = true;
       vendeur_id = undefined;
     } 
     else if (req.user && req.user.role_id === 2 && isPublic !== 'true') {
-      // Vendeur sans ?public=true → uniquement ses produits
       vendeur_id = req.user.id;
       includeInactif = false;
     } 
     else {
-      // Client, visiteur, ou vendeur avec ?public=true → tous les produits actifs
       includeInactif = false;
       vendeur_id = undefined;
     }
@@ -92,13 +88,11 @@ const ProduitController = {
   async update(req, res) {
   try {
     const { id } = req.params;
-
-    // Récupérer le produit existant
     const produitExistant = await ProduitDAO.findById(id);
+
     if (!produitExistant)
       return res.status(404).json({ success: false, message: 'Produit introuvable' });
 
-    // ✅ Vérification : admin autorisé, sinon seul le propriétaire
     if (produitExistant.vendeur_id !== req.user.id && req.user.role_id !== 1) {
       return res.status(403).json({ success: false, message: 'Non autorisé' });
     }
@@ -148,7 +142,6 @@ const ProduitController = {
     if (!produit)
       return res.status(404).json({ success: false, message: 'Produit introuvable' });
 
-    // Seul le propriétaire ou l'admin peut supprimer définitivement
     if (produit.vendeur_id !== req.user.id && req.user.role_id !== 1) {
       return res.status(403).json({ success: false, message: 'Non autorisé' });
     }
@@ -163,9 +156,9 @@ const ProduitController = {
   async reactiver(req, res) {
   try {
     const produit = await ProduitDAO.findById(req.params.id);
+    
     if (!produit) return res.status(404).json({ success: false, message: 'Produit introuvable' });
 
-    // Seul l'admin peut réactiver un produit (optionnel : vendeur pourrait réactiver le sien)
     if (req.user.role_id !== 1) {
       return res.status(403).json({ success: false, message: 'Non autorisé' });
     }
