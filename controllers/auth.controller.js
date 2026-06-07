@@ -9,9 +9,9 @@ const { logConnexion } = require('../middleware/auth.middleware');
 
 // ── Transporteur Brevo ────────────────────────────────────────
 const createTransporter = () => nodemailer.createTransport({
-  host:   'smtp-relay.brevo.com',
-  port:   587,
-  secure: false,
+  host:   'in-v3.mailjet.com',
+  port:   443,
+  secure: true,
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS,
